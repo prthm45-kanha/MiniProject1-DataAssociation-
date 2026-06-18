@@ -1,0 +1,32 @@
+{
+  "name": "miniproject1-dataassociation-",
+  "version": "1.0.0",
+  "description": "A Node.js and MongoDB project showcasing data association, authentication, and secure user management with Express, Mongoose, JWT, Bcrypt, and Cookie-Parser.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prthm45-kanha/MiniProject1-DataAssociation-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/prthm45-kanha/MiniProject1-DataAssociation-/issues"
+  },
+  "homepage": "https://github.com/prthm45-kanha/MiniProject1-DataAssociation-#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.7.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
