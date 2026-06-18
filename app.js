@@ -6,6 +6,7 @@ const jwt=require('jsonwebtoken');
 const bcrypt=require('bcrypt');
 const userModel=require('./models/user');
 const postModel=require('./models/post');
+const user = require('./models/user');
 
 
 app.use(cookieParser());
@@ -21,14 +22,35 @@ app.get('/',(req,res)=>{
 app.get('/login',(req,res)=>{
     res.render('login');
 })
- app.get('/logout',(req,res)=>{
+app.get('/logout',(req,res)=>{
     res.cookie("token","");
     res.redirect('/login');
- })
- app.get('/profile',isLoggedIn,(req,res)=>{
-    console.log(req.user);
-    res.render('login');
- })
+})
+app.get('/profile',isLoggedIn,async (req,res)=>{
+    let useer=await userModel.findOne({email:req.user.email}).populate('posts');
+    console.log(useer);
+    
+    res.render('profile',{useer});
+})
+app.post("/post",isLoggedIn,async (req,res)=>{
+    let useer= await userModel.findOne({email:req.user.email});
+    let{contentt}=req.body;
+    let post=await postModel.create({
+        user:useer._id,
+        content:contentt
+    });
+    useer.posts.push(post._id);
+    await useer.save();
+    res.redirect('/profile')
+})
+function isLoggedIn(req,res,next){
+    if(req.cookies.token === "") res.redirect("/login")
+        else{
+    let data=jwt.verify(req.cookies.token,"secret");
+    req.user=data;
+    next();
+    }
+}
 app.post('/login',async (req,res)=>{
     let{email,password}=req.body;
     let findUser=await userModel.findOne({email});
@@ -38,7 +60,7 @@ app.post('/login',async (req,res)=>{
         if(result){
             let tokenn = jwt.sign({email:email,userid:findUser._id},"secret");
            res.cookie("token",tokenn);
-             res.status(200).send("Thank You For Login");
+             res.status(200).redirect('/profile');
         }
 
         else res.redirect('/login');
@@ -67,14 +89,6 @@ app.post('/register',async (req,res)=>{
 
 
 })
-function isLoggedIn(req,res,next){
-    if(req.cookies.token === "") res.send("You must be logged in first")
-        else{
-    let data=jwt.verify(req.cookies.token,"secret");
-    req.user=data;
-    }
-    next();
-}
 app.listen(3000,()=>{
     console.log("Server is running on port 3000");
 })
