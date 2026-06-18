@@ -18,10 +18,28 @@ app.use(express.static(path.join(__dirname,'public')));
 app.get('/',(req,res)=>{
     res.render('index');
 })
+app.get('/login',(req,res)=>{
+    res.render('login');
+})
+ app.get('/logout',(req,res)=>{
+    res.cookie("token","");
+    res.redirect('/login');
+ })
+app.post('/login',async (req,res)=>{
+    let{email,password}=req.body;
+    let findUser=await userModel.findOne({email});
+    if(!findUser) res.status(500).send("Something Went Wrong");
+
+    bcrypt.compare(password,findUser.password,(err,result)=>{
+        if(result) res.status(200).send("Thank You For Login");
+        else res.redirect('/login');
+    })
+});
+
 app.post('/register',async (req,res)=>{
     let{username,name,age,email,password}=req.body;
-    let findUser=await userModel.findOne({email});
-    if(findUser) return res.status(500).send("User Already Register");
+    let findUser=await userModel.findOne({email,username});
+    if(findUser) return res.redirect('/login');
 
     bcrypt.genSalt(10,(err,salt)=>{
         bcrypt.hash(password,salt,async (err,hash)=>{
