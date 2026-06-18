@@ -5,6 +5,8 @@ const cookieParser=require('cookie-parser');
 const jwt=require('jsonwebtoken');
 const bcrypt=require('bcrypt');
 const userModel=require('./models/user');
+const postModel=require('./models/post');
+
 
 app.use(cookieParser());
 app.set('view engine','ejs');
@@ -14,7 +16,29 @@ app.use(express.static(path.join(__dirname,'public')));
 
 
 app.get('/',(req,res)=>{
-    res.send("vjhvwcdj");
+    res.render('index');
+})
+app.post('/register',async (req,res)=>{
+    let{username,name,age,email,password}=req.body;
+    let findUser=await userModel.findOne({email});
+    if(findUser) return res.status(500).send("User Already Register");
+
+    bcrypt.genSalt(10,(err,salt)=>{
+        bcrypt.hash(password,salt,async (err,hash)=>{
+            let createUser= await userModel.create({
+                username,
+                name,
+                age,
+                email,
+                password:hash
+            });
+            let tokenn = jwt.sign({email:email,userid:createUser._id},"secret");
+            res.cookie("token",tokenn);
+            res.send("registered")
+        })
+    })
+
+
 })
 app.listen(3000,()=>{
     console.log("Server is running on port 3000");
