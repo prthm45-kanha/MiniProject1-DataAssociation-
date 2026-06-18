@@ -25,13 +25,22 @@ app.get('/login',(req,res)=>{
     res.cookie("token","");
     res.redirect('/login');
  })
+ app.get('/profile',isLoggedIn,(req,res)=>{
+    console.log(req.user);
+    res.render('login');
+ })
 app.post('/login',async (req,res)=>{
     let{email,password}=req.body;
     let findUser=await userModel.findOne({email});
     if(!findUser) res.status(500).send("Something Went Wrong");
 
     bcrypt.compare(password,findUser.password,(err,result)=>{
-        if(result) res.status(200).send("Thank You For Login");
+        if(result){
+            let tokenn = jwt.sign({email:email,userid:findUser._id},"secret");
+           res.cookie("token",tokenn);
+             res.status(200).send("Thank You For Login");
+        }
+
         else res.redirect('/login');
     })
 });
@@ -58,6 +67,14 @@ app.post('/register',async (req,res)=>{
 
 
 })
+function isLoggedIn(req,res,next){
+    if(req.cookies.token === "") res.send("You must be logged in first")
+        else{
+    let data=jwt.verify(req.cookies.token,"secret");
+    req.user=data;
+    }
+    next();
+}
 app.listen(3000,()=>{
     console.log("Server is running on port 3000");
 })
