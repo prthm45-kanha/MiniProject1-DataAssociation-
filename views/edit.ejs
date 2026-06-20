@@ -14,8 +14,8 @@
         </div>
 
     <h5>You can Edit your post</h5>
-    <form action="/post" method="post">
-        <textarea placeholder="What's on your Mind" class="w-1/3 block px-3 py-3 resize-none bg-transparent border-[1px] outline-none border-zinc-600 rounded-md mt-3" name="contentt"></textarea>
+    <form action="/update/<%= post._id %>" method="post">
+        <textarea placeholder="What's on your Mind" class="w-1/3 block px-3 py-3 resize-none bg-transparent border-[1px] outline-none border-zinc-600 rounded-md mt-3" name="contentt"><%= post.content %></textarea>
         <input class="px-3 py-2  rounded-md text-sm font-bold block text-black bg-yellow-600 mt-3 " type="submit" value="Update your Post"/>
     </form>
     
